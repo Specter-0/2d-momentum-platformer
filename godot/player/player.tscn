@@ -1,0 +1,198 @@
+[gd_scene load_steps=25 format=3 uid="uid://bpl2o2x7fhppi"]
+
+[ext_resource type="Texture2D" uid="uid://de5yu1cw411c7" path="res://icon.svg" id="1_3gqdf"]
+[ext_resource type="Script" path="res://player/scripts/player.gd" id="1_7dybc"]
+[ext_resource type="Script" path="res://player/scripts/BaseCharacterStateMachine.gd" id="3_7nonk"]
+[ext_resource type="Shape2D" uid="uid://b5prqahqfc58f" path="res://player/collisionShapes/normal_shape.tres" id="3_xr3vk"]
+[ext_resource type="Script" path="res://player/scripts/GroundState.gd" id="4_56lqe"]
+[ext_resource type="Script" path="res://player/scripts/idle_state.gd" id="5_i8mno"]
+[ext_resource type="Script" path="res://player/scripts/move_state.gd" id="6_4wsv0"]
+[ext_resource type="Script" path="res://player/scripts/attack_state.gd" id="7_nu1ng"]
+[ext_resource type="Script" path="res://player/scripts/slide_state.gd" id="8_0vbry"]
+[ext_resource type="Script" path="res://player/scripts/dash_state.gd" id="9_rm6m0"]
+[ext_resource type="Script" path="res://player/scripts/AirState.gd" id="10_xxvhi"]
+[ext_resource type="Script" path="res://player/scripts/climb_state.gd" id="11_aw2eo"]
+[ext_resource type="Script" path="res://player/crouch_state.gd" id="11_tqi3e"]
+[ext_resource type="Script" path="res://player/scripts/peak_state.gd" id="12_758lm"]
+[ext_resource type="Script" path="res://player/scripts/fall_state.gd" id="13_de2qj"]
+[ext_resource type="Script" path="res://player/scripts/air_dash_state.gd" id="14_e1kyb"]
+[ext_resource type="Script" path="res://player/scripts/stateLabel.gd" id="15_wgepr"]
+[ext_resource type="Script" path="res://player/scripts/wall_state.gd" id="18_ws752"]
+[ext_resource type="Script" path="res://player/scripts/hang.gd" id="19_nqgqk"]
+[ext_resource type="Script" path="res://player/scripts/wall_dash.gd" id="20_l4frp"]
+[ext_resource type="Script" path="res://player/scripts/wall_slide.gd" id="20_ud1o1"]
+[ext_resource type="Script" path="res://player/scripts/wall_jump.gd" id="21_kcipk"]
+[ext_resource type="Script" path="res://player/scripts/grappling.gd" id="22_4nd50"]
+[ext_resource type="Script" path="res://player/bafoon_state.gd" id="23_i5sqv"]
+
+[node name="player" type="CharacterBody2D"]
+script = ExtResource("1_7dybc")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(9.53674e-07, 9.53674e-07)
+scale = Vector2(0.300782, 0.300782)
+texture = ExtResource("1_3gqdf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = ExtResource("3_xr3vk")
+
+[node name="LeftCast" type="RayCast2D" parent="."]
+target_position = Vector2(-23, 0)
+
+[node name="RightCast" type="RayCast2D" parent="."]
+target_position = Vector2(23, 0)
+
+[node name="Dash_Cooldown" type="Timer" parent="."]
+one_shot = true
+
+[node name="BaseCharacterStateMachine" type="Node" parent="." node_paths=PackedStringArray("currentState", "character")]
+script = ExtResource("3_7nonk")
+currentState = NodePath("ground")
+character = NodePath("..")
+
+[node name="ground" type="Node" parent="BaseCharacterStateMachine" node_paths=PackedStringArray("air_state", "character", "currentState")]
+script = ExtResource("4_56lqe")
+air_state = NodePath("../air")
+character = NodePath("../..")
+currentState = NodePath("idle")
+
+[node name="BufferTimer" type="Timer" parent="BaseCharacterStateMachine/ground"]
+wait_time = 0.1
+one_shot = true
+autostart = true
+
+[node name="Slide_Cooldown" type="Timer" parent="BaseCharacterStateMachine/ground"]
+one_shot = true
+
+[node name="idle" type="Node" parent="BaseCharacterStateMachine/ground" node_paths=PackedStringArray("ground_state", "character")]
+script = ExtResource("5_i8mno")
+ground_state = NodePath("..")
+character = NodePath("../../..")
+
+[node name="move" type="Node" parent="BaseCharacterStateMachine/ground" node_paths=PackedStringArray("ground_state", "character")]
+script = ExtResource("6_4wsv0")
+ground_state = NodePath("..")
+character = NodePath("../../..")
+
+[node name="attack" type="Node" parent="BaseCharacterStateMachine/ground" node_paths=PackedStringArray("character")]
+script = ExtResource("7_nu1ng")
+character = NodePath("../../..")
+
+[node name="slide" type="Node" parent="BaseCharacterStateMachine/ground" node_paths=PackedStringArray("ground_state", "character")]
+script = ExtResource("8_0vbry")
+ground_state = NodePath("..")
+character = NodePath("../../..")
+standard_movement = false
+can_move = false
+
+[node name="dash" type="Node" parent="BaseCharacterStateMachine/ground" node_paths=PackedStringArray("ground_state", "character")]
+script = ExtResource("9_rm6m0")
+ground_state = NodePath("..")
+character = NodePath("../../..")
+standard_movement = false
+can_move = false
+Gravity = false
+can_grapple = false
+
+[node name="crouch" type="Node" parent="BaseCharacterStateMachine/ground" node_paths=PackedStringArray("character")]
+script = ExtResource("11_tqi3e")
+character = NodePath("../../..")
+
+[node name="air" type="Node" parent="BaseCharacterStateMachine" node_paths=PackedStringArray("ground_state", "wall_state", "character", "currentState")]
+script = ExtResource("10_xxvhi")
+ground_state = NodePath("../ground")
+wall_state = NodePath("../wall")
+character = NodePath("../..")
+currentState = NodePath("climb")
+
+[node name="climb" type="Node" parent="BaseCharacterStateMachine/air" node_paths=PackedStringArray("air_state", "character")]
+script = ExtResource("11_aw2eo")
+air_state = NodePath("..")
+character = NodePath("../../..")
+
+[node name="peak" type="Node" parent="BaseCharacterStateMachine/air" node_paths=PackedStringArray("air_state", "character")]
+script = ExtResource("12_758lm")
+air_state = NodePath("..")
+character = NodePath("../../..")
+
+[node name="fall" type="Node" parent="BaseCharacterStateMachine/air" node_paths=PackedStringArray("air_state", "character")]
+script = ExtResource("13_de2qj")
+air_state = NodePath("..")
+character = NodePath("../../..")
+
+[node name="air_dash" type="Node" parent="BaseCharacterStateMachine/air" node_paths=PackedStringArray("air_state", "character")]
+script = ExtResource("14_e1kyb")
+air_state = NodePath("..")
+character = NodePath("../../..")
+standard_movement = false
+can_move = false
+Gravity = false
+can_grapple = false
+
+[node name="Jump_buffer" type="Timer" parent="BaseCharacterStateMachine/air"]
+one_shot = true
+
+[node name="Coyote_time" type="Timer" parent="BaseCharacterStateMachine/air"]
+one_shot = true
+
+[node name="wall" type="Node" parent="BaseCharacterStateMachine" node_paths=PackedStringArray("air_state", "ground_state", "character", "currentState")]
+script = ExtResource("18_ws752")
+air_state = NodePath("../air")
+ground_state = NodePath("../ground")
+character = NodePath("../..")
+currentState = NodePath("hang")
+
+[node name="hang" type="Node" parent="BaseCharacterStateMachine/wall" node_paths=PackedStringArray("wall_state", "character")]
+script = ExtResource("19_nqgqk")
+wall_state = NodePath("..")
+max_hang_sliding_speed = 800.0
+character = NodePath("../../..")
+can_move = false
+Gravity = false
+
+[node name="wall_slide" type="Node" parent="BaseCharacterStateMachine/wall" node_paths=PackedStringArray("wall_state", "character")]
+script = ExtResource("20_ud1o1")
+wall_state = NodePath("..")
+character = NodePath("../../..")
+Gravity = false
+
+[node name="wall_jump" type="Node" parent="BaseCharacterStateMachine/wall" node_paths=PackedStringArray("wall_state", "character")]
+script = ExtResource("21_kcipk")
+wall_state = NodePath("..")
+character = NodePath("../../..")
+
+[node name="wall_dash" type="Node" parent="BaseCharacterStateMachine/wall" node_paths=PackedStringArray("wall_state", "character")]
+script = ExtResource("20_l4frp")
+wall_state = NodePath("..")
+character = NodePath("../../..")
+standard_movement = false
+can_move = false
+Gravity = false
+can_grapple = false
+
+[node name="To_slide" type="Timer" parent="BaseCharacterStateMachine/wall"]
+one_shot = true
+
+[node name="Quick_jump" type="Timer" parent="BaseCharacterStateMachine/wall"]
+one_shot = true
+
+[node name="Wall_Jump_buffer" type="Timer" parent="BaseCharacterStateMachine/wall"]
+one_shot = true
+
+[node name="grappling" type="Node" parent="BaseCharacterStateMachine" node_paths=PackedStringArray("currentState")]
+script = ExtResource("22_4nd50")
+currentState = NodePath("bafoon_state")
+
+[node name="bafoon_state" type="Node" parent="BaseCharacterStateMachine/grappling"]
+script = ExtResource("23_i5sqv")
+
+[node name="state" type="Label" parent="." node_paths=PackedStringArray("state_machine")]
+offset_left = -66.0
+offset_top = -54.0
+offset_right = 66.0
+offset_bottom = -28.0
+text = "State: "
+script = ExtResource("15_wgepr")
+state_machine = NodePath("../BaseCharacterStateMachine")
+
+[connection signal="timeout" from="BaseCharacterStateMachine/wall/To_slide" to="BaseCharacterStateMachine/wall" method="_on_to_slide_timeout"]
