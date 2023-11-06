@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://b4w88uctqtjsr"]
+[gd_scene load_steps=7 format=3 uid="uid://b4w88uctqtjsr"]
 
 [ext_resource type="Texture2D" uid="uid://de5yu1cw411c7" path="res://icon.svg" id="1_iw21t"]
 [ext_resource type="PackedScene" uid="uid://bpl2o2x7fhppi" path="res://player/player.tscn" id="2_alca2"]
+[ext_resource type="PackedScene" uid="uid://bu270vj8yfuvn" path="res://grapple/grapple point.tscn" id="3_bxkx7"]
+[ext_resource type="Script" path="res://grapple_line.gd" id="5_obyyy"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w27h8"]
 texture = ExtResource("1_iw21t")
@@ -283,9 +285,17 @@ air_deacceleration = 1.75
 jump_velocity = -550.0
 double_jump_velocity = -450.0
 amount_of_double_jumps = 1
+boost_jump_strenght = 0.35
+boost_jump_cutoff = -200.0
 dash_range = Vector2(1200, 1200)
 dash_time = 0.5
 dash_charge_time = 0.5
+slide_speed_boost = 2.35
+slide_deacceleration = 4.0
+slide_exit_hinder = -200.0
+slide_exit_jump_boost_strenght = 8.0
+slide_exit_max_jump_boost = -350.0
+slide_cooldown = 1.0
 wall_jump_speed = Vector2(800, -450)
 wall_slide_wait = 1.0
 wall_slide_speed = 300.0
@@ -301,3 +311,44 @@ position = Vector2(49, -58)
 zoom = Vector2(1.5, 1.5)
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0
+
+[node name="Line2D" type="Line2D" parent="." node_paths=PackedStringArray("character")]
+points = PackedVector2Array(0, 0, 0, 0)
+width = 3.0
+default_color = Color(0, 0.92549, 0.698039, 1)
+script = ExtResource("5_obyyy")
+character = NodePath("../player")
+
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="grapple_point" parent="Node2D" node_paths=PackedStringArray("character") instance=ExtResource("3_bxkx7")]
+position = Vector2(-218, -614)
+character = NodePath("../../player")
+
+[node name="grapple_point2" parent="Node2D" node_paths=PackedStringArray("character") instance=ExtResource("3_bxkx7")]
+position = Vector2(446, -841)
+character = NodePath("../../player")
+
+[node name="grapple_point3" parent="Node2D" node_paths=PackedStringArray("character") instance=ExtResource("3_bxkx7")]
+position = Vector2(-1811, -351)
+character = NodePath("../../player")
+
+[node name="grapple_point4" parent="Node2D" node_paths=PackedStringArray("character") instance=ExtResource("3_bxkx7")]
+position = Vector2(-2622, -533)
+character = NodePath("../../player")
+
+[node name="grapple_point5" parent="Node2D" node_paths=PackedStringArray("character") instance=ExtResource("3_bxkx7")]
+position = Vector2(-3327, -677)
+character = NodePath("../../player")
+
+[node name="grapple_point6" parent="Node2D" node_paths=PackedStringArray("character") instance=ExtResource("3_bxkx7")]
+position = Vector2(-4061, -870)
+character = NodePath("../../player")
+
+[node name="grapple_point7" parent="Node2D" node_paths=PackedStringArray("character") instance=ExtResource("3_bxkx7")]
+position = Vector2(-4644, -1062)
+character = NodePath("../../player")
+
+[node name="grapple_point8" parent="Node2D" node_paths=PackedStringArray("character") instance=ExtResource("3_bxkx7")]
+position = Vector2(3936, -2904)
+character = NodePath("../../player")
