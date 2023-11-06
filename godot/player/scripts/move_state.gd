@@ -5,3 +5,8 @@ extends State
 func state_process(_delta): 
 	if character.velocity.x == 0:
 		next_state = ground_state.idle
+
+
+func on_enter():
+	character.collision_shape.shape = character.normal_collision_shape[0]
+	character.collision_shape.position = character.normal_collision_shape[1]

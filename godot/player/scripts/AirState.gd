@@ -12,6 +12,7 @@ extends State_State_Machine
 @onready var peak : State = $peak
 @onready var climb : State = $climb
 @onready var fall : State = $fall
+@onready var air_dash : State = $air_dash
 
 var has_double_jumped : bool = false
 var double_jump_count : int = 1
@@ -34,12 +35,19 @@ func state_process(_delta):
 		has_double_jumped = false
 		next_state = ground_state
 	
+	if Input.is_action_pressed("crouch"):
+		pass
+		#crouch()
+
 	wall_raycast()
-
-
+	
+	
 func state_input(event : InputEvent):
 	if event.is_action_pressed("jump"):
 		jump()
+		
+	if event.is_action_pressed("dash"):
+		dash()
 
 
 func wall_raycast():
@@ -64,10 +72,23 @@ func coyote_jump():
 
 
 func double_jump():
-	character.velocity.y = character.double_jump_velocity
+	if abs(character.velocity.y) < abs(character.jump_velocity) && character.velocity.y < character.boost_jump_cutoff:
+		character.velocity.y += character.double_jump_velocity * character.boost_jump_strenght
+	else:
+		character.velocity.y = character.double_jump_velocity
 	
 	if character.amount_of_double_jumps == double_jump_count && character.amount_of_double_jumps != -1:
 		has_double_jumped = true
 		double_jump_count = 1
 	else:
 		double_jump_count += 1
+
+
+func dash():
+	currentState.next_state = air_dash
+
+
+func crouch():
+	character.collision_shape.shape = character.croutch_collision_shape[0]
+	character.collision_shape.position = character.croutch_collision_shape[1]
+	character.velocity.y += 50
